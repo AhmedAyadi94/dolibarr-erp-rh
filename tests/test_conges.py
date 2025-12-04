@@ -26,7 +26,7 @@ from selenium.common.exceptions import TimeoutException
 # Configuration
 BASE_URL = "http://localhost/dolibarr"
 USERNAME = "admin"
-PASSWORD = "admin"
+PASSWORD = "ahmed123"
 WAIT_TIMEOUT = 10
 
 
