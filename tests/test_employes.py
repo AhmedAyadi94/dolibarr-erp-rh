@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 
 # -*- coding: utf-8 -*-
 """
 Tests automatisés pour le module Employés de Dolibarr ERP RH
@@ -51,8 +51,9 @@ class TestEmployes:
         driver.get(BASE_URL)
         
         try:
+            # Correction du champ login
             username_field = WebDriverWait(driver, WAIT_TIMEOUT).until(
-                EC.presence_of_element_located((By.NAME, "username"))
+                EC.presence_of_element_located((By.NAME, "login"))
             )
             username_field.clear()
             username_field.send_keys(USERNAME)
@@ -64,7 +65,6 @@ class TestEmployes:
             login_button = driver.find_element(By.CSS_SELECTOR, "input[type='submit']")
             login_button.click()
             
-            # Attendre que la page d'accueil charge
             WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.presence_of_element_located((By.ID, "mainmenu"))
             )
@@ -75,33 +75,22 @@ class TestEmployes:
     def test_creation_employe(self, logged_in_driver):
         """TC-EMP-001 : Test de création d'un employé"""
         driver = logged_in_driver
-        
-        # Accéder au module RH
         driver.get(f"{BASE_URL}/user/index.php")
         time.sleep(2)
         
-        # Cliquer sur "Nouvel employé"
         try:
             nouveau_btn = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.element_to_be_clickable((By.LINK_TEXT, "Nouvel utilisateur"))
             )
             nouveau_btn.click()
             
-            # Remplir le formulaire
-            nom_field = driver.find_element(By.NAME, "lastname")
-            nom_field.send_keys("Dupont")
+            driver.find_element(By.NAME, "lastname").send_keys("Dupont")
+            driver.find_element(By.NAME, "firstname").send_keys("Jean")
+            driver.find_element(By.NAME, "email").send_keys("jean.dupont@telcogroup.fr")
             
-            prenom_field = driver.find_element(By.NAME, "firstname")
-            prenom_field.send_keys("Jean")
-            
-            email_field = driver.find_element(By.NAME, "email")
-            email_field.send_keys("jean.dupont@telcogroup.fr")
-            
-            # Soumettre le formulaire
             submit_btn = driver.find_element(By.CSS_SELECTOR, "input[name='create']")
             submit_btn.click()
             
-            # Vérifier la création
             success_msg = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "ok"))
             )
@@ -114,18 +103,15 @@ class TestEmployes:
     def test_consultation_employe(self, logged_in_driver):
         """TC-EMP-002 : Test de consultation fiche employé"""
         driver = logged_in_driver
-        
         driver.get(f"{BASE_URL}/user/index.php")
         time.sleep(2)
         
         try:
-            # Cliquer sur un employé dans la liste
             premier_employe = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "tr.oddeven a"))
             )
             premier_employe.click()
             
-            # Vérifier présence informations
             nom_element = driver.find_element(By.CLASS_NAME, "refidno")
             assert nom_element is not None, "Nom employé non trouvé"
             print("[PASS] Consultation fiche employé réussie")
@@ -136,33 +122,27 @@ class TestEmployes:
     def test_modification_employe(self, logged_in_driver):
         """TC-EMP-003 : Test de modification employé"""
         driver = logged_in_driver
-        
         driver.get(f"{BASE_URL}/user/index.php")
         time.sleep(2)
         
         try:
-            # Ouvrir fiche employé
             premier_employe = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "tr.oddeven a"))
             )
             premier_employe.click()
             time.sleep(1)
             
-            # Cliquer sur Modifier
             modifier_btn = driver.find_element(By.LINK_TEXT, "Modifier")
             modifier_btn.click()
             time.sleep(1)
             
-            # Modifier email
             email_field = driver.find_element(By.NAME, "email")
             email_field.clear()
             email_field.send_keys("jean.dupont.modifie@telcogroup.fr")
             
-            # Enregistrer
             save_btn = driver.find_element(By.NAME, "edit")
             save_btn.click()
             
-            # Vérifier modification
             success_msg = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "ok"))
             )
@@ -174,7 +154,6 @@ class TestEmployes:
 
 
 if __name__ == "__main__":
-    """Exécution des tests"""
     pytest.main([
         __file__,
         "-v",
