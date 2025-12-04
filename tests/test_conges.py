@@ -52,12 +52,15 @@ class TestConges:
         driver.get(BASE_URL)
         
         try:
+            # Champ login corrigé
             username_field = WebDriverWait(driver, WAIT_TIMEOUT).until(
-                EC.presence_of_element_located((By.NAME, "username"))
+                EC.presence_of_element_located((By.NAME, "login"))
             )
+            username_field.clear()
             username_field.send_keys(USERNAME)
             
             password_field = driver.find_element(By.NAME, "password")
+            password_field.clear()
             password_field.send_keys(PASSWORD)
             
             login_button = driver.find_element(By.CSS_SELECTOR, "input[type='submit']")
@@ -74,41 +77,29 @@ class TestConges:
         """TC-CONG-001 : Test de demande de congés payés"""
         driver = logged_in_driver
         
-        # Accéder au module Congés
         driver.get(f"{BASE_URL}/holiday/list.php")
         time.sleep(2)
         
         try:
-            # Cliquer sur "Nouvelle demande"
             nouvelle_demande_btn = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.element_to_be_clickable((By.LINK_TEXT, "Nouvelle demande"))
             )
             nouvelle_demande_btn.click()
             time.sleep(1)
             
-            # Sélectionner type de congé
             type_select = Select(driver.find_element(By.NAME, "type"))
             type_select.select_by_visible_text("Congés payés")
             
-            # Définir les dates
             date_debut = (datetime.now() + timedelta(days=7)).strftime("%d/%m/%Y")
             date_fin = (datetime.now() + timedelta(days=11)).strftime("%d/%m/%Y")
             
-            date_debut_field = driver.find_element(By.NAME, "date_debut")
-            date_debut_field.send_keys(date_debut)
+            driver.find_element(By.NAME, "date_debut").send_keys(date_debut)
+            driver.find_element(By.NAME, "date_fin").send_keys(date_fin)
+            driver.find_element(By.NAME, "comment").send_keys("Congés d'été - Test automatique")
             
-            date_fin_field = driver.find_element(By.NAME, "date_fin")
-            date_fin_field.send_keys(date_fin)
-            
-            # Ajouter commentaire
-            commentaire_field = driver.find_element(By.NAME, "comment")
-            commentaire_field.send_keys("Congés d'été - Test automatique")
-            
-            # Soumettre
             submit_btn = driver.find_element(By.CSS_SELECTOR, "input[type='submit']")
             submit_btn.click()
             
-            # Vérifier création
             success_msg = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "ok"))
             )
@@ -126,7 +117,6 @@ class TestConges:
         time.sleep(2)
         
         try:
-            # Vérifier présence tableau des soldes
             solde_element = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "liste"))
             )
@@ -144,18 +134,15 @@ class TestConges:
         time.sleep(2)
         
         try:
-            # Cliquer sur première demande en attente
             demande_link = WebDriverWait(driver, WAIT_TIMEOUT).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "tr.oddeven a"))
             )
             demande_link.click()
             time.sleep(1)
             
-            # Valider la demande
             valider_btn = driver.find_element(By.LINK_TEXT, "Valider")
             valider_btn.click()
             
-            # Confirmer validation
             confirm_btn = driver.find_element(By.NAME, "confirm")
             confirm_btn.click()
             
@@ -170,7 +157,6 @@ class TestConges:
 
 
 if __name__ == "__main__":
-    """Exécution des tests"""
     pytest.main([
         __file__,
         "-v",
